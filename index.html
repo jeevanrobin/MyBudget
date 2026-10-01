@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>MyBudget</title>
+  <meta name="description" content="Track your spending every day.">
+  <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+  <!-- iPhone "Add to Home Screen" -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MyBudget">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="title">Today</h1>
+  </header>
+
+  <main>
+    <!-- TODAY -->
+    <section id="view-today" class="view active">
+      <div class="daynav">
+        <button class="icon-btn" id="day-prev" aria-label="Previous day">‹</button>
+        <button class="day-label" id="day-label"></button>
+        <button class="icon-btn" id="day-next" aria-label="Next day">›</button>
+      </div>
+
+      <div class="card hero">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" class="ring">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-fg" id="ring-fg"/>
+          </svg>
+          <div class="ring-text">
+            <div class="ring-label" id="left-label">Left today</div>
+            <div class="ring-amount" id="left-today">—</div>
+            <div class="ring-sub" id="allowance"></div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div><span class="muted">Spent</span><strong id="spent-day">0</strong></div>
+          <div><span class="muted">Income</span><strong id="income-day" class="pos">0</strong></div>
+          <div><span class="muted">Month left</span><strong id="month-left">0</strong></div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Entries</h2>
+      <ul class="tx-list" id="day-list"></ul>
+      <p class="empty" id="day-empty">No entries for this day. Tap <b>+</b> to add one.</p>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="view-history" class="view">
+      <input type="search" id="search" class="search" placeholder="Search notes or categories">
+      <div id="history-list"></div>
+      <p class="empty" id="history-empty">Nothing here yet.</p>
+    </section>
+
+    <!-- STATS -->
+    <section id="view-stats" class="view">
+      <div class="daynav">
+        <button class="icon-btn" id="month-prev" aria-label="Previous month">‹</button>
+        <div class="day-label" id="month-label"></div>
+        <button class="icon-btn" id="month-next" aria-label="Next month">›</button>
+      </div>
+      <div class="card">
+        <div class="stats-row">
+          <div><span class="muted">Spent</span><strong id="m-spent">0</strong></div>
+          <div><span class="muted">Income</span><strong id="m-income" class="pos">0</strong></div>
+          <div><span class="muted">Budget</span><strong id="m-budget">0</strong></div>
+        </div>
+        <div class="bar"><div class="bar-fill" id="m-bar"></div></div>
+        <p class="muted small" id="m-note"></p>
+      </div>
+      <h2 class="section-title">Daily spending</h2>
+      <div class="card"><div class="chart" id="daily-chart"></div></div>
+      <h2 class="section-title">By category</h2>
+      <div class="card"><ul class="cat-list" id="cat-list"></ul></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view">
+      <div class="card form">
+        <label>Monthly budget
+          <input type="number" id="set-budget" inputmode="decimal" min="0" step="any" placeholder="e.g. 30000">
+        </label>
+        <label>Currency symbol
+          <input type="text" id="set-currency" maxlength="4" placeholder="₹">
+        </label>
+        <label>Month starts on day
+          <input type="number" id="set-startday" inputmode="numeric" min="1" max="28" placeholder="1">
+        </label>
+      </div>
+
+      <h2 class="section-title">Expense categories</h2>
+      <div class="card">
+        <div class="chips" id="cat-chips"></div>
+        <form class="inline-form" id="cat-form">
+          <input type="text" id="cat-new" placeholder="New category" maxlength="20">
+          <button class="btn small">Add</button>
+        </form>
+      </div>
+
+      <h2 class="section-title">Backup</h2>
+      <div class="card actions">
+        <button class="btn ghost" id="export-csv">Export CSV</button>
+        <button class="btn ghost" id="export-json">Export backup (JSON)</button>
+        <label class="btn ghost file-btn">Restore backup<input type="file" id="import-json" accept="application/json,.json" hidden></label>
+        <button class="btn danger" id="clear-all">Delete all data</button>
+      </div>
+      <p class="muted small pad">Data is stored only on this device. Export a backup now and then.</p>
+
+      <div class="card install" id="install-tip">
+        <strong>Install on iPhone</strong>
+        <p>Open this page in Safari, tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</p>
+      </div>
+    </section>
+  </main>
+
+  <button class="fab" id="fab" aria-label="Add entry">+</button>
+
+  <nav class="tabbar">
+    <button data-view="today" class="active"><span>●</span>Today</button>
+    <button data-view="history"><span>☰</span>History</button>
+    <button data-view="stats"><span>▮</span>Stats</button>
+    <button data-view="settings"><span>⚙</span>Settings</button>
+  </nav>
+
+  <!-- ADD / EDIT SHEET -->
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
+  <form class="sheet" id="sheet" autocomplete="off">
+    <div class="sheet-handle"></div>
+    <div class="segmented">
+      <button type="button" data-type="expense" class="active">Expense</button>
+      <button type="button" data-type="income">Income</button>
+    </div>
+    <div class="amount-input">
+      <span id="cur-symbol">₹</span>
+      <input type="number" id="f-amount" inputmode="decimal" step="any" min="0" placeholder="0" required>
+    </div>
+    <div class="chips" id="f-cats"></div>
+    <input type="text" id="f-note" class="field" placeholder="Note (optional)" maxlength="80">
+    <input type="date" id="f-date" class="field" required>
+    <div class="sheet-actions">
+      <button type="button" class="btn danger ghost" id="f-delete" hidden>Delete</button>
+      <button type="button" class="btn ghost" id="f-cancel">Cancel</button>
+      <button type="submit" class="btn">Save</button>
+    </div>
+  </form>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
